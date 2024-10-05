@@ -1,0 +1,165 @@
+#!/bin/sh -eu
+#
+# Dotfiles - manage configuration "dot" files with Git.
+# by Wesley J. Landaker <wjl@icecavern.net>
+#
+# This work is marked with CC0 1.0. To view a copy of this license, visit
+# https://creativecommons.org/publicdomain/zero/1.0/
+
+# Project information.
+dotfiles_project_url="https://github.com/wjl/dotfiles-project"
+dotfiles_project_version="1.0.0"
+
+# Base directories.
+dotfiles_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles"
+dotfiles_data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles"
+dotfiles_program_dir="${HOME}/.local/bin"
+
+# Specific directories.
+dotfiles_setup_dir="$dotfiles_config_dir"/setup
+dotfiles_user_repo="$dotfiles_data_dir"/dotfiles.git
+
+# Dotfiles project location.
+dotfiles_project_submodule="${dotfiles_data_dir#$HOME/}"/dotfiles-project
+
+dotfiles() {
+	# Ensure nothing we create is world accessible.
+	umask 077
+
+	# Capture the command, leave the rest as arguments.
+	local command="${1:-}"
+	if [ $# -gt 0 ]; then shift; fi
+
+	# Dispatch commands.
+	case "$command" in
+		help|--help|-h)        dotfiles_help    "$@" ;;
+		version|--version|-v)  dotfiles_version "$@" ;;
+		init)                  dotfiles_init    "$@" ;;
+		clone)                 dotfiles_clone   "$@" ;;
+		setup)                 dotfiles_setup   "$@" ;;
+		git)                   dotfiles_git     "$@" ;;
+		*)                     dotfiles_default "$command" "$@" ;;
+	esac
+}
+
+dotfiles_version() {
+	cat <<-END
+		Dotfiles version $dotfiles_project_version
+		by Wesley J. Landaker
+		See $dotfiles_project_url
+END
+}
+
+dotfiles_help() {
+	dotfiles_version
+	cat <<-END
+
+	Usage: dotfiles <command> ...
+
+	Manage configuration "dot" files with Git.
+
+	Commands:
+	  version       -- show version information
+	  help          -- show this help message
+
+	  init          -- initialize a dotfiles repository
+	  clone <repo>  -- clone an existing dotfiles repository
+	  setup         -- re-run setup programs explicitly
+
+	  git <command> -- run a Git command in dotfiles context
+	  *             -- anything else is passed through to Git
+
+	Your files:
+	  Git Repository: $dotfiles_user_repo
+	  Setup Programs: $dotfiles_setup_dir
+END
+}
+
+# Configure the repository the same way for both init and clone.
+configure_repository() {
+
+	# Don't show untracked files or it would show the entire home directory!
+	dotfiles config --local status.showUntrackedFiles no
+
+	# Set up hooks to automatically call dotfiles setup on updates.
+	for hook in post-checkout post-merge; do
+		local hook_path="$dotfiles_user_repo"/hooks/"$hook"
+		cat <<-END > "$hook_path"
+			#!/bin/sh
+			dotfiles setup
+END
+		chmod u+x "$hook_path"
+	done
+
+	# Ensure submodule commands are run from the top.
+	cd
+
+	# Add the dotfiles project as a submodule if it's not there already.
+	if ! dotfiles submodule status "$dotfiles_project_submodule"; then
+		dotfiles submodule add \
+			"$dotfiles_project_url" \
+			"$dotfiles_project_submodule"
+	fi
+
+	# Ensure the dotfiles project is initialized and matches this version.
+	dotfiles git submodule init "$dotfiles_project_submodule"
+	cd "$dotfiles_project_submodule"
+	git fetch --tags
+	git config advice.detachedHead false
+	git checkout "$dotfiles_project_version"
+
+	# Link the dotfiles program into the user's program directory.
+	mkdir -p "$dotfiles_program_dir"
+	cd "$dotfiles_program_dir"
+	ln -sf "$HOME"/"$dotfiles_project_submodule"/dotfiles .
+	dotfiles add dotfiles
+}
+
+dotfiles_init() {
+	dotfiles git init
+	configure_repository
+	dotfiles setup
+}
+
+dotfiles_clone() {
+	local tmp_worktree=$(mktemp -d)
+	mkdir -p "$dotfiles_data_dir"
+	git clone --no-checkout --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
+	rm -rf "$tmp_worktree"
+	configure_repository
+	dotfiles restore --staged "$HOME"
+}
+
+dotfiles_setup() {
+	run_parts() {
+		local dir="$1"
+		for part in "$dir"/*; do
+			if [ "$part" = "$dir/*" ]; then break; fi
+			printf '[%s]\n' "$part"
+			if [ -d "$part" ]; then
+				run_parts "$part"
+			elif [ -x "$part" ]; then
+				"$part"
+			fi
+		done
+	}
+	mkdir -p "$dotfiles_setup_dir"
+	cd       "$dotfiles_setup_dir"
+	run_parts .
+}
+
+dotfiles_git() {
+	git --git-dir="$dotfiles_user_repo" --work-tree="$HOME" "$@"
+}
+
+dotfiles_default() {
+	if [ -z "$1" ]; then
+		dotfiles help >&2
+		exit 1
+	else
+		dotfiles git "$@"
+	fi
+}
+
+# Launch the main program.
+dotfiles "$@"
