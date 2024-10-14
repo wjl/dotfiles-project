@@ -8,7 +8,7 @@
 
 # Project information.
 dotfiles_project_url="https://github.com/wjl/dotfiles-project"
-dotfiles_project_version="1.0.0"
+dotfiles_project_version="1.0.1"
 
 # Base directories.
 dotfiles_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles"
@@ -86,6 +86,9 @@ configure_repository() {
 		local hook_path="$dotfiles_user_repo"/hooks/"$hook"
 		cat <<-END > "$hook_path"
 			#!/bin/sh
+			for var in \$(env | grep GIT_ | sed -e 's/=.*//'); do
+				unset "\$var"
+			done
 			dotfiles setup
 END
 		chmod u+x "$hook_path"
