@@ -119,14 +119,15 @@ END
 }
 
 dotfiles_init() {
+	mkdir -p "$dotfiles_data_dir"
 	dotfiles git init
 	configure_repository
 	dotfiles setup
 }
 
 dotfiles_clone() {
-	local tmp_worktree=$(mktemp -d)
 	mkdir -p "$dotfiles_data_dir"
+	local tmp_worktree=$(mktemp -d)
 	git clone --no-checkout --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
 	rm -rf "$tmp_worktree"
 	configure_repository
