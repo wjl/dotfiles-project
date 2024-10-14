@@ -98,7 +98,7 @@ END
 	cd
 
 	# Add the dotfiles project as a submodule if it's not there already.
-	if ! dotfiles submodule status "$dotfiles_project_submodule"; then
+	if ! dotfiles submodule status "$dotfiles_project_submodule" 2> /dev/null; then
 		dotfiles submodule add \
 			"$dotfiles_project_url" \
 			"$dotfiles_project_submodule"
