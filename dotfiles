@@ -8,7 +8,7 @@
 
 # Project information.
 dotfiles_project_url="https://github.com/wjl/dotfiles-project"
-dotfiles_project_version="1.0.1"
+dotfiles_project_version="1.0.2"
 
 # Base directories.
 dotfiles_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles"
