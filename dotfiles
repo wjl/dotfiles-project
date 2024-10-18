@@ -8,7 +8,7 @@
 
 # Project information.
 dotfiles_project_url="https://github.com/wjl/dotfiles-project"
-dotfiles_project_version="1.0.2"
+dotfiles_project_version="1.0.3"
 
 # Base directories.
 dotfiles_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles"
@@ -131,7 +131,7 @@ dotfiles_clone() {
 	git clone --no-checkout --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
 	rm -rf "$tmp_worktree"
 	configure_repository
-	dotfiles restore --staged "$HOME"
+	dotfiles ls-files --deleted -z | xargs -0 git restore
 }
 
 dotfiles_setup() {

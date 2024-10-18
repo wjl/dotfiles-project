@@ -61,7 +61,7 @@ sh -c 'curl -fsL https://github.com/wjl/dotfiles-project/releases/latest/downloa
 You basically just do `dotfiles <some git command>`, so you need to know how to use Git.
 
 ```
-Dotfiles version 1.0.0
+Dotfiles version 1.0.3
 by Wesley J. Landaker
 See https://github.com/wjl/dotfiles-project
 
