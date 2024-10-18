@@ -79,7 +79,7 @@ END
 configure_repository() {
 
 	# Don't show untracked files or it would show the entire home directory!
-	dotfiles config --local status.showUntrackedFiles no
+	dotfiles_git config --local status.showUntrackedFiles no
 
 	# Set up hooks to automatically call dotfiles setup on updates.
 	for hook in post-checkout post-merge; do
@@ -89,7 +89,7 @@ configure_repository() {
 			for var in \$(env | grep GIT_ | sed -e 's/=.*//'); do
 				unset "\$var"
 			done
-			dotfiles setup
+			dotfiles_setup
 END
 		chmod u+x "$hook_path"
 	done
@@ -98,27 +98,27 @@ END
 	cd
 
 	# Add the dotfiles project as a submodule if it's not there already.
-	if ! dotfiles submodule status "$dotfiles_project_submodule" 2> /dev/null; then
-		dotfiles submodule add \
+	if ! dotfiles_git submodule status "$dotfiles_project_submodule" 2> /dev/null; then
+		dotfiles_git submodule add \
 			"$dotfiles_project_url" \
 			"$dotfiles_project_submodule"
-		dotfiles git submodule update --init "$dotfiles_project_submodule"
+		dotfiles_git submodule update --init "$dotfiles_project_submodule"
 	fi
 
 	# Link the dotfiles program into the user's program directory.
 	mkdir -p "$dotfiles_program_dir"
 	cd "$dotfiles_program_dir"
 	ln -sf "$HOME"/"$dotfiles_project_submodule"/dotfiles .
-	dotfiles add dotfiles
+	dotfiles_git add dotfiles
 
 	# Run setup scripts.
-	dotfiles setup
+	dotfiles_setup
 }
 
 dotfiles_init() {
 	# Initialize repository.
 	mkdir -p "$dotfiles_data_dir"
-	dotfiles git init
+	dotfiles_git init
 
 	# Configuration.
 	configure_repository
@@ -133,11 +133,11 @@ dotfiles_clone() {
 	
 	# Checkout missing files.
 	cd
-	dotfiles restore --staged .
-	dotfiles ls-files --deleted -z . | xargs -0 git restore
+	dotfiles_git restore --staged .
+	dotfiles_git ls-files --deleted -z . | xargs -0 git restore
 
 	# Update submodules.
-	dotfiles submodule update --init --recursive
+	dotfiles_git submodule update --init --recursive
 
 	# Configuration
 	configure_repository
@@ -167,10 +167,10 @@ dotfiles_git() {
 
 dotfiles_default() {
 	if [ -z "$1" ]; then
-		dotfiles help >&2
+		dotfiles_help >&2
 		exit 1
 	else
-		dotfiles git "$@"
+		dotfiles_git "$@"
 	fi
 }
 
