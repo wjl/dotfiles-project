@@ -33,10 +33,17 @@ If you want to share some of your dotfiles publically in Git repositories, caref
 
 ## Quick Start (First System)
 
-Download the "dotfiles" shell script and run `dotfiles init`, or:
+Run `dotfiles init`, for example:
 
 ```bash
-sh -c 'curl -fsL https://github.com/wjl/dotfiles-project/releases/latest/download/dotfiles | sh -s init'
+curl -fsL https://github.com/wjl/dotfiles-project/raw/refs/heads/master/dotfiles | sh -s init
+```
+
+or
+
+```bash
+git clone https://github.com/wjl/dotfiles-project.git
+./dotfiles-project.git init
 ```
 
 This will install dotfiles and initialize a new repository.
@@ -50,10 +57,17 @@ dotfiles push
 
 ## Quick Start (Additional System)
 
-Download the "dotfiles" shell script and run `dotfiles clone <your dotfiles repo>`, or:
+Run `dotfiles clone <your dotfiles repo>`, or:
 
 ```bash
-sh -c 'curl -fsL https://github.com/wjl/dotfiles-project/releases/latest/download/dotfiles | sh -s clone <your dotfiles repo>'
+curl -fsL https://github.com/wjl/dotfiles-project/raw/refs/heads/master/dotfiles | sh -s clone <your dotfiles repo>
+```
+
+or
+
+```bash
+git clone https://github.com/wjl/dotfiles-project.git
+./dotfiles-project.git clone <your dotfiles repo>'
 ```
 
 ## General Usage
@@ -61,7 +75,7 @@ sh -c 'curl -fsL https://github.com/wjl/dotfiles-project/releases/latest/downloa
 You basically just do `dotfiles <some git command>`, so you need to know how to use Git.
 
 ```
-Dotfiles version 1.0.3
+Dotfiles version 1.0.4
 by Wesley J. Landaker
 See https://github.com/wjl/dotfiles-project
 

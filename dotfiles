@@ -8,7 +8,7 @@
 
 # Project information.
 dotfiles_project_url="https://github.com/wjl/dotfiles-project"
-dotfiles_project_version="1.0.3"
+dotfiles_project_version="1.0.4"
 
 # Base directories.
 dotfiles_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles"
@@ -102,14 +102,8 @@ END
 		dotfiles submodule add \
 			"$dotfiles_project_url" \
 			"$dotfiles_project_submodule"
+		dotfiles git submodule update --init "$dotfiles_project_submodule"
 	fi
-
-	# Ensure the dotfiles project is initialized and matches this version.
-	dotfiles git submodule init "$dotfiles_project_submodule"
-	cd "$dotfiles_project_submodule"
-	git fetch --tags
-	git config advice.detachedHead false
-	git checkout "$dotfiles_project_version"
 
 	# Link the dotfiles program into the user's program directory.
 	mkdir -p "$dotfiles_program_dir"
@@ -128,10 +122,11 @@ dotfiles_init() {
 dotfiles_clone() {
 	mkdir -p "$dotfiles_data_dir"
 	local tmp_worktree=$(mktemp -d)
-	git clone --no-checkout --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
+	git clone --no-checkout --no-recursive --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
 	rm -rf "$tmp_worktree"
-	configure_repository
 	dotfiles ls-files --deleted -z | xargs -0 git restore
+	dotfiles submodule update --init --recursive
+	configure_repository
 }
 
 dotfiles_setup() {
