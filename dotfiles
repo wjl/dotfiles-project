@@ -131,12 +131,10 @@ dotfiles_clone() {
 	git clone --no-checkout --no-recursive --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
 	rm -rf "$tmp_worktree"
 
-	# Update submodules.
-	dotfiles_git submodule update --init --recursive
-
-	# Checkout missing files.
+	# Do manual checkout.
 	cd
 	dotfiles_git restore --staged .
+	dotfiles_git submodule update --init --recursive
 	dotfiles_git ls-files --deleted -z . | xargs -0 dotfiles git restore
 
 	# Configuration
