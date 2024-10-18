@@ -133,7 +133,7 @@ dotfiles_clone() {
 	cd
 	dotfiles_git restore --staged .
 	dotfiles_git submodule update --init "$dotfiles_project_submodule"
-	dotfiles_git ls-files --deleted -z . | xargs -0 git --git-dir="$dotfiles_user_repo" --work-tree="$HOME" git restore
+	dotfiles_git ls-files --deleted -z . | xargs -0 git --git-dir="$dotfiles_user_repo" --work-tree="$HOME" restore
 	dotfiles_git submodule update --init --recursive
 
 	# Configuration
