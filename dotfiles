@@ -110,13 +110,15 @@ END
 	cd "$dotfiles_program_dir"
 	ln -sf "$HOME"/"$dotfiles_project_submodule"/dotfiles .
 	dotfiles add dotfiles
+
+	# Run setup scripts.
+	dotfiles setup
 }
 
 dotfiles_init() {
 	mkdir -p "$dotfiles_data_dir"
 	dotfiles git init
 	configure_repository
-	dotfiles setup
 }
 
 dotfiles_clone() {
@@ -124,6 +126,8 @@ dotfiles_clone() {
 	local tmp_worktree=$(mktemp -d)
 	git clone --no-checkout --no-recursive --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
 	rm -rf "$tmp_worktree"
+	cd
+	dotfiles restore --staged
 	dotfiles ls-files --deleted -z | xargs -0 git restore
 	dotfiles submodule update --init --recursive
 	configure_repository
