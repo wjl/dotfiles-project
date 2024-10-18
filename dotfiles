@@ -141,6 +141,9 @@ dotfiles_clone() {
 	dotfiles_git restore .
 	dotfiles_git submodule update --init --recursive
 
+	# Remove conflicts directory if it's empty.
+	rmdir "$conflict_dir" || ls -la "$conflict_dir"
+
 	# Configuration
 	configure_repository
 }
