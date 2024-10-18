@@ -25,9 +25,10 @@ dotfiles_project_submodule="${dotfiles_data_dir#$HOME/}"/dotfiles-project
 # Full path to this program.
 dotfiles_program=$(realpath "$0")
 
+# Ensure nothing we create is world accessible.
+umask 077
+
 dotfiles() {
-	# Ensure nothing we create is world accessible.
-	umask 077
 
 	# Capture the command, leave the rest as arguments.
 	local command="${1:-}"
@@ -97,17 +98,6 @@ END
 		chmod u+x "$hook_path"
 	done
 
-	# Ensure submodule commands are run from the top.
-	cd
-
-	# Add the dotfiles project as a submodule if it's not there already.
-	if ! dotfiles_git submodule status "$dotfiles_project_submodule" 2> /dev/null; then
-		dotfiles_git submodule add \
-			"$dotfiles_project_url" \
-			"$dotfiles_project_submodule"
-		dotfiles_git submodule update --init "$dotfiles_project_submodule"
-	fi
-
 	# Link the dotfiles program into the user's program directory.
 	mkdir -p "$dotfiles_program_dir"
 	cd "$dotfiles_program_dir"
@@ -123,6 +113,11 @@ dotfiles_init() {
 	mkdir -p "$dotfiles_data_dir"
 	dotfiles_git init
 
+	# Add the dotfiles project as a submodule.
+	cd
+	dotfiles_git submodule add "$dotfiles_project_url" "$dotfiles_project_submodule"
+	dotfiles_git submodule update --init "$dotfiles_project_submodule"
+
 	# Configuration.
 	configure_repository
 }
@@ -137,8 +132,9 @@ dotfiles_clone() {
 	# Do manual checkout.
 	cd
 	dotfiles_git restore --staged .
+	dotfiles_git submodule update --init "$dotfiles_project_submodule"
+	dotfiles_git ls-files --deleted -z . | xargs -0 git --git-dir="$dotfiles_user_repo" --work-tree="$HOME" git restore
 	dotfiles_git submodule update --init --recursive
-	dotfiles_git ls-files --deleted -z . | xargs -0 "$dotfiles_program" git restore
 
 	# Configuration
 	configure_repository
