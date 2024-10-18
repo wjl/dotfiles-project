@@ -129,11 +129,14 @@ dotfiles_clone() {
 	git clone --no-checkout --no-recursive --separate-git-dir="$dotfiles_user_repo" "$@" "$tmp_worktree"
 	rm -rf "$tmp_worktree"
 
-	# Do manual checkout.
+	# Make a directory to store conflicts.
 	cd
-	dotfiles_git restore --staged .
 	local conflict_dir=dotfiles-conflicts."$(date +"%FT%T")"
 	mkdir -p "$conflict_dir"
+
+	# Do manual checkout.
+	dotfiles_git restore --staged .
+	dotfiles_git ls-files -z --deleted   . | xargs -0 git --git-dir="$dotfiles_user_repo" --work-tree="$HOME" restore
 	dotfiles_git ls-files -z --modified  . | xargs -0 -i mv {} "$conflict_dir"
 	dotfiles_git restore .
 	dotfiles_git submodule update --init --recursive
