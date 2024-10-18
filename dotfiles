@@ -134,7 +134,7 @@ dotfiles_clone() {
 	# Checkout missing files.
 	cd
 	dotfiles_git restore --staged .
-	dotfiles_git ls-files --deleted -z . | xargs -0 git restore
+	dotfiles_git ls-files --deleted -z . | xargs -0 dotfiles_git restore
 
 	# Update submodules.
 	dotfiles_git submodule update --init --recursive
