@@ -22,6 +22,9 @@ dotfiles_user_repo="$dotfiles_data_dir"/dotfiles.git
 # Dotfiles project location.
 dotfiles_project_submodule="${dotfiles_data_dir#$HOME/}"/dotfiles-project
 
+# Full path to this program.
+dotfiles_program=$(realpath "$0")
+
 dotfiles() {
 	# Ensure nothing we create is world accessible.
 	umask 077
@@ -135,7 +138,7 @@ dotfiles_clone() {
 	cd
 	dotfiles_git restore --staged .
 	dotfiles_git submodule update --init --recursive
-	dotfiles_git ls-files --deleted -z . | xargs -0 dotfiles git restore
+	dotfiles_git ls-files --deleted -z . | xargs -0 "$dotfiles_program" git restore
 
 	# Configuration
 	configure_repository
