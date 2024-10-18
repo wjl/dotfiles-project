@@ -43,7 +43,7 @@ or
 
 ```bash
 git clone https://github.com/wjl/dotfiles-project.git
-./dotfiles-project.git init
+./dotfiles-project/dotfiles init
 ```
 
 This will install dotfiles and initialize a new repository.
@@ -67,7 +67,7 @@ or
 
 ```bash
 git clone https://github.com/wjl/dotfiles-project.git
-./dotfiles-project.git clone <your dotfiles repo>'
+./dotfiles-project/dotfiles clone <your dotfiles repo>'
 ```
 
 ## General Usage
