@@ -50,7 +50,8 @@ This will install dotfiles and initialize a new repository.
 After this, you basically just use `dotfiles` just like `git` to manage things, for example:
 
 ```bash
-dotfiles commit -m "New dotfiles repository."
+dotfiles add <config files>
+dotfiles commmit -m "Added some config files."
 dotfiles remote add origin <your dotfiles repo>
 dotfiles push
 ```
@@ -67,7 +68,7 @@ or
 
 ```bash
 git clone https://github.com/wjl/dotfiles-project.git
-./dotfiles-project/dotfiles clone <your dotfiles repo>'
+./dotfiles-project/dotfiles clone <your dotfiles repo>
 ```
 
 ## General Usage
