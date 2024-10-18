@@ -93,7 +93,7 @@ configure_repository() {
 			for var in \$(env | grep GIT_ | sed -e 's/=.*//'); do
 				unset "\$var"
 			done
-			dotfiles_setup
+			~/.local/bin/dotfiles setup
 END
 		chmod u+x "$hook_path"
 	done
