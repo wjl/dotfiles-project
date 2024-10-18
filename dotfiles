@@ -134,8 +134,8 @@ dotfiles_clone() {
 	dotfiles_git restore --staged .
 	local conflict_dir=dotfiles-conflicts."$(date +"%FT%T")"
 	mkdir -p "$conflict_dir"
-	dotfiles_git ls-files -z --killed  . | xargs -0 -i mv {} "$conflict_dir"
-	dotfiles_git ls-files -z --deleted . | xargs -0 git --git-dir="$dotfiles_user_repo" --work-tree="$HOME" restore
+	dotfiles_git ls-files -z --modified  . | xargs -0 -i mv {} "$conflict_dir"
+	dotfiles_git restore .
 	dotfiles_git submodule update --init --recursive
 
 	# Configuration
